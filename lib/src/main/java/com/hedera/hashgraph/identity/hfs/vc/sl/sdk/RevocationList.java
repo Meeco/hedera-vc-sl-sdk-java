@@ -1,47 +1,81 @@
 package com.hedera.hashgraph.identity.hfs.vc.sl.sdk;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.BitSet;
-
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class RevocationList {
+    public final static int DEFAULT_LIST_BIT_SIZE = 100_032;
 
-    private final BitSet bitstring;
-    private final int length;
+    private final BitSet bitset;
+    /**
+     * INFO: BitSet size has to divide by 64 otherwise java will increase the size to match this criteria
+     */
+    private final int size;
 
-    public RevocationList(){
-        this.bitstring = new BitSet(100_000);
-        this.bitstring.set(0, 100_000);
-        this.length = this.bitstring.length();
+    public RevocationList() {
+        this.bitset = new BitSet(RevocationList.DEFAULT_LIST_BIT_SIZE);
+        this.size = this.bitset.size();
     }
 
     public RevocationList(int number) {
-        this.bitstring = new BitSet(number);
-        this.length = this.bitstring.length();
+        this.bitset = new BitSet(number);
+        this.size = this.bitset.size();
     }
 
-    public BitSet getBitstring() {
-        return bitstring;
+    public RevocationList(BitSet bitset) {
+        this.bitset = bitset;
+        this.size = this.bitset.size();
     }
 
-    public int getLength() {
-        return length;
+    public BitSet getBitset() {
+        return bitset;
+    }
+
+    public int getSize() {
+        return size;
     }
 
     public void setRevoked(int index, boolean revoked) {
-        this.bitstring.set(10, revoked);
+        this.bitset.set(index, revoked);
     }
 
     public boolean isRevoked(int index) {
-        return this.bitstring.get(index);
+        return this.bitset.get(index);
     }
 
-    public String encode() {
-      return  Base64.getEncoder().encodeToString(this.bitstring.toByteArray());
+    public String encode() throws IOException {
+        byte[] bitsetAsByteArray = this.bitset.toByteArray();
+        byte[] byteArrayExtended = new byte[(int) Math.ceil(this.getSize() / 8)];
+        System.arraycopy(bitsetAsByteArray, 0, byteArrayExtended, 0, bitsetAsByteArray.length);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        GZIPOutputStream gzip = new GZIPOutputStream(bos);
+        gzip.write(byteArrayExtended);
+        gzip.close();
+
+        return Base64.getUrlEncoder().encodeToString(bos.toByteArray());
     }
 
-    public BitSet decode(String encodedList){
-        return BitSet.valueOf(Base64.getDecoder().decode(encodedList));
+    public static RevocationList decodeList(String encodedList) throws IOException {
+        byte[] compressedBitset = Base64.getUrlDecoder().decode(encodedList);
+
+        ByteArrayInputStream bos = new ByteArrayInputStream(compressedBitset);
+        GZIPInputStream gis = new GZIPInputStream(bos);
+
+        byte[] bitsetBytes = gis.readAllBytes();
+        gis.close();
+
+        BitSet resultBitset = new BitSet(bitsetBytes.length * 8);
+        BitSet optimizedBitset = BitSet.valueOf(bitsetBytes);
+
+        resultBitset.or(optimizedBitset);
+
+        return new RevocationList(resultBitset);
     }
 
 }
