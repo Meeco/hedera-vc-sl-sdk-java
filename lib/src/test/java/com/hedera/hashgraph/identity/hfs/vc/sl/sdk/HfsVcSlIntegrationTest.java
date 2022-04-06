@@ -7,6 +7,7 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.*;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.concurrent.TimeoutException;
@@ -55,7 +56,8 @@ class HfsVcSlIntegrationTest {
     void itCreatesRevocationList() throws PrecheckStatusException, TimeoutException {
         FileContentsQuery query = new FileContentsQuery().setFileId(HfsVcSlIntegrationTest.fileId);
         ByteString encodedStatusList = query.execute(HfsVcSlIntegrationTest.client);
-        assertEquals(ByteString.copyFromUtf8("mockContent"), encodedStatusList);
+        assertTrue(encodedStatusList.toStringUtf8().startsWith("H4sIAAAAAA"));
+        assertEquals(64, encodedStatusList.size());
     }
 
     /**
@@ -65,14 +67,19 @@ class HfsVcSlIntegrationTest {
     @Test
     @Order(211)
     @DisplayName("loads file and returns a status list")
-    void itLoadsStatusListFileContent() throws PrecheckStatusException, TimeoutException {
+    void itLoadsStatusListFileContent() throws PrecheckStatusException, TimeoutException, IOException {
         HfsVcSl hfsVcSl = new HfsVcSl(HfsVcSlIntegrationTest.client, HfsVcSlIntegrationTest.fileKey);
-        ByteString decodedStatusList = hfsVcSl.loadRevocationList(HfsVcSlIntegrationTest.fileId);
-        assertEquals(ByteString.copyFromUtf8("mockContent"), decodedStatusList);
+        RevocationList list = hfsVcSl.loadRevocationList(HfsVcSlIntegrationTest.fileId);
+
+        assertEquals(100032, list.getSize());
+
+        for (int i = 0; i < 100032; i++) {
+            assertFalse(list.isRevoked(i));
+        }
     }
 
     /**
-     * TODO: Change credential status by index
+     * Change credential status by index
      */
 
     @Test
