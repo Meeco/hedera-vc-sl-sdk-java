@@ -1,14 +1,17 @@
 package com.hedera.hashgraph.identity.hfs.vc.sl.sdk;
 
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.UnsignedBytes;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.BitSet;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 @Tag("unit")
@@ -32,6 +35,7 @@ public class RevocationListTest {
         gzip.write(bitSetByteArrayExtended);
         gzip.close();
         byte[] compressed = bos.toByteArray();
+
         bos.close();
 
         var result = Base64.getUrlEncoder().encodeToString(compressed);
@@ -42,8 +46,18 @@ public class RevocationListTest {
 
 
     @Test
-    void test(){
-        var result = Base64.getUrlDecoder().decode("H4sIAAAAAAAAA-3BMQEAAADCoPVPbQsvoAAAAAAAAAAAAAAAAP4GcwM92tQwAAA");
-        System.out.println(Arrays.toString(result));
+    void test() throws IOException {
+        var result = Base64.getUrlDecoder().decode("H4sIAAAAAAAAA-3OQREAAAQAMHcCqKJ_Oi3w2BKsogPW5HUAAAAAAAAAAAAAAIAvBv4TWiDUMAAA");
+
+        ByteArrayInputStream bos = new ByteArrayInputStream(result);
+        GZIPInputStream gis = new GZIPInputStream(bos);
+
+
+            // copy GZIPInputStream to FileOutputStream
+            byte[] test = gis.readAllBytes();
+
+            gis.close();
+
+        System.out.println(Arrays.toString(test));
     }
 }
