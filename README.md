@@ -54,6 +54,11 @@ appropriate `testnet` account details in <b>`lib/src/test/resources/demo.config.
 - OPERATOR_ID=0.0.xxxx
 - OPERATOR_KEY=302...
 
+and make sure DID information is set to empty at the moment:
+
+- VC_STATUS_LIST_OWNER_PRIVATE_KEY=
+- VC_STATUS_LIST_FILE_ID=
+
 ## Setup 1 Create status list
 
 ```shell
