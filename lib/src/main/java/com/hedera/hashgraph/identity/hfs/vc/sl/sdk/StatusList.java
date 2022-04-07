@@ -8,7 +8,7 @@ import java.util.BitSet;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class RevocationList {
+public class StatusList {
     public final static int DEFAULT_LIST_BIT_SIZE = 100_032;
 
     private final BitSet bitset;
@@ -17,17 +17,17 @@ public class RevocationList {
      */
     private final int size;
 
-    public RevocationList() {
-        this.bitset = new BitSet(RevocationList.DEFAULT_LIST_BIT_SIZE);
+    public StatusList() {
+        this.bitset = new BitSet(StatusList.DEFAULT_LIST_BIT_SIZE);
         this.size = this.bitset.size();
     }
 
-    public RevocationList(int number) {
+    public StatusList(int number) {
         this.bitset = new BitSet(number);
         this.size = this.bitset.size();
     }
 
-    public RevocationList(BitSet bitset) {
+    public StatusList(BitSet bitset) {
         this.bitset = bitset;
         this.size = this.bitset.size();
     }
@@ -61,7 +61,7 @@ public class RevocationList {
         return Base64.getUrlEncoder().encodeToString(bos.toByteArray());
     }
 
-    public static RevocationList decodeList(String encodedList) throws IOException {
+    public static StatusList decodeList(String encodedList) throws IOException {
         byte[] compressedBitset = Base64.getUrlDecoder().decode(encodedList);
 
         ByteArrayInputStream bos = new ByteArrayInputStream(compressedBitset);
@@ -75,7 +75,7 @@ public class RevocationList {
 
         resultBitset.or(optimizedBitset);
 
-        return new RevocationList(resultBitset);
+        return new StatusList(resultBitset);
     }
 
 }

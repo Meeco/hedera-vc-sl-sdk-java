@@ -18,8 +18,8 @@ public class HfsVcSl {
         this.vcStatusListOwnerPrivateKey = vcStatusListOwnerPrivateKey;
     }
 
-    public FileId createRevocationListFile() throws PrecheckStatusException, TimeoutException, ReceiptStatusException, IOException {
-        RevocationList vcStatusList = new RevocationList();
+    public FileId createStatusListFile() throws PrecheckStatusException, TimeoutException, ReceiptStatusException, IOException {
+        StatusList vcStatusList = new StatusList();
         String encodedVcStatusList = vcStatusList.encode();
 
         FileCreateTransaction transaction = new FileCreateTransaction()
@@ -35,11 +35,11 @@ public class HfsVcSl {
         return txReceipt.fileId;
     }
 
-    public RevocationList loadRevocationList(FileId vcStatusFileId) throws PrecheckStatusException, TimeoutException, IOException {
+    public StatusList loadStatusList(FileId vcStatusFileId) throws PrecheckStatusException, TimeoutException, IOException {
         FileContentsQuery query = new FileContentsQuery().setFileId(vcStatusFileId);
         ByteString encodedStatusList = query.execute(this.client);
 
-        return RevocationList.decodeList(encodedStatusList.toStringUtf8());
+        return StatusList.decodeList(encodedStatusList.toStringUtf8());
     }
 
     public void revokeByIndex(FileId vcStatusListFileId, int vcStatusListIndex) throws Exception {
@@ -59,7 +59,7 @@ public class HfsVcSl {
     }
 
     public VcSlStatus resolveStatusByIndex(FileId vcStatusListFileId, int vcStatusListIndex) throws Exception {
-        RevocationList list = this.loadRevocationList(vcStatusListFileId);
+        StatusList list = this.loadStatusList(vcStatusListFileId);
 
         if (!list.isRevoked(vcStatusListIndex) && !list.isRevoked(vcStatusListIndex + 1)) {
             return VcSlStatus.ACTIVE;
@@ -78,12 +78,12 @@ public class HfsVcSl {
      * Private functions
      */
 
-    private RevocationList updateStatus(FileId vcStatusListFileId, int vcStatusListIndex, VcSlStatus status) throws Exception {
+    private StatusList updateStatus(FileId vcStatusListFileId, int vcStatusListIndex, VcSlStatus status) throws Exception {
         if (vcStatusListIndex % 2 != 0) {
             throw new Error("vcStatusListIndex must be Multiples of 2 OR 0. e.g. 0, 2, 4, 6, 8, 10, 12, 14");
         }
 
-        RevocationList list = this.loadRevocationList(vcStatusListFileId);
+        StatusList list = this.loadStatusList(vcStatusListFileId);
 
         switch (status) {
             case ACTIVE:
