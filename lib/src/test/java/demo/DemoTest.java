@@ -53,12 +53,12 @@ public class DemoTest {
     void create() throws IOException, ReceiptStatusException, PrecheckStatusException, TimeoutException {
 
         var hfsVc = new HfsVcSl(client, VC_STATUS_LIST_OWNER_PRIVATE_KEY);
-        var VC_STATUS_LIST_FILE_ID = hfsVc.createRevocationListFile();
+        var VC_STATUS_LIST_FILE_ID = hfsVc.createStatusListFile();
 
         System.out.printf("VC_STATUS_LIST_FILE_ID: %s%n", VC_STATUS_LIST_FILE_ID.toString());
         System.out.printf("VC_STATUS_LIST_OWNER_PRIVATE_KEY: %s%n", VC_STATUS_LIST_OWNER_PRIVATE_KEY.toString());
 
-        System.out.println(hfsVc.loadRevocationList(VC_STATUS_LIST_FILE_ID).getBitset().toString());
+        System.out.println(hfsVc.loadStatusList(VC_STATUS_LIST_FILE_ID).getBitset().toString());
 
     }
 
@@ -69,7 +69,7 @@ public class DemoTest {
         var hfsVc = new HfsVcSl(client, VC_STATUS_LIST_OWNER_PRIVATE_KEY);
 
         var resolveStatus = hfsVc.resolveStatusByIndex(this.VC_STATUS_LIST_FILE_ID, 0);
-        var rl = hfsVc.loadRevocationList(this.VC_STATUS_LIST_FILE_ID);
+        var rl = hfsVc.loadStatusList(this.VC_STATUS_LIST_FILE_ID);
 
         System.out.println("==== status ====");
         System.out.println(resolveStatus);
@@ -89,7 +89,7 @@ public class DemoTest {
 
         System.out.printf("Revoked by index position %d%n", statusIndex);
 
-        System.out.printf("status list %s", hfsVc.loadRevocationList(VC_STATUS_LIST_FILE_ID).getBitset().toString());
+        System.out.printf("status list %s", hfsVc.loadStatusList(VC_STATUS_LIST_FILE_ID).getBitset().toString());
     }
 
     @Test
@@ -102,7 +102,7 @@ public class DemoTest {
 
         System.out.printf("Active by index position %d%n", statusIndex);
 
-        System.out.println(hfsVc.loadRevocationList(VC_STATUS_LIST_FILE_ID).getBitset().toString());
+        System.out.println(hfsVc.loadStatusList(VC_STATUS_LIST_FILE_ID).getBitset().toString());
 
     }
 
@@ -116,7 +116,7 @@ public class DemoTest {
 
         System.out.printf("Suspend by index position %d%n", statusIndex);
 
-        System.out.println(hfsVc.loadRevocationList(VC_STATUS_LIST_FILE_ID).getBitset().toString());
+        System.out.println(hfsVc.loadStatusList(VC_STATUS_LIST_FILE_ID).getBitset().toString());
 
     }
 
@@ -130,7 +130,7 @@ public class DemoTest {
 
         System.out.printf("Resume by index position %d%n", statusIndex);
 
-        System.out.println(hfsVc.loadRevocationList(VC_STATUS_LIST_FILE_ID).getBitset().toString());
+        System.out.println(hfsVc.loadStatusList(VC_STATUS_LIST_FILE_ID).getBitset().toString());
 
     }
 

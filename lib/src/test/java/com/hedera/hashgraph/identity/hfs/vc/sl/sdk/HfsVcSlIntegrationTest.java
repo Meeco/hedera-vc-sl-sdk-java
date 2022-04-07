@@ -40,20 +40,20 @@ class HfsVcSlIntegrationTest {
             PrivateKey operatorKey = PrivateKey.fromString(prop.getProperty("OPERATOR_KEY"));
             client.setOperator(operatorId, operatorKey);
 
-            HfsVcSlIntegrationTest.fileId = new HfsVcSl(HfsVcSlIntegrationTest.client, HfsVcSlIntegrationTest.fileKey).createRevocationListFile();
+            HfsVcSlIntegrationTest.fileId = new HfsVcSl(HfsVcSlIntegrationTest.client, HfsVcSlIntegrationTest.fileKey).createStatusListFile();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     /**
-     * #createRevocationListFile
+     * #createStatusListFile
      */
 
     @Test
     @Order(111)
-    @DisplayName("creates a revocation list on HFS")
-    void itCreatesRevocationList() throws PrecheckStatusException, TimeoutException {
+    @DisplayName("creates a status list on HFS")
+    void itCreatesStatusList() throws PrecheckStatusException, TimeoutException {
         FileContentsQuery query = new FileContentsQuery().setFileId(HfsVcSlIntegrationTest.fileId);
         ByteString encodedStatusList = query.execute(HfsVcSlIntegrationTest.client);
         assertTrue(encodedStatusList.toStringUtf8().startsWith("H4sIAAAAAA"));
@@ -61,7 +61,7 @@ class HfsVcSlIntegrationTest {
     }
 
     /**
-     * #loadRevocationList
+     * #loadStatusList
      */
 
     @Test
@@ -69,7 +69,7 @@ class HfsVcSlIntegrationTest {
     @DisplayName("loads file and returns a status list")
     void itLoadsStatusListFileContent() throws PrecheckStatusException, TimeoutException, IOException {
         HfsVcSl hfsVcSl = new HfsVcSl(HfsVcSlIntegrationTest.client, HfsVcSlIntegrationTest.fileKey);
-        RevocationList list = hfsVcSl.loadRevocationList(HfsVcSlIntegrationTest.fileId);
+        StatusList list = hfsVcSl.loadStatusList(HfsVcSlIntegrationTest.fileId);
 
         assertEquals(100032, list.getSize());
 
@@ -84,7 +84,7 @@ class HfsVcSlIntegrationTest {
 
     @Test
     @Order(311)
-    @DisplayName("should apply revoked status to revocation list index 0")
+    @DisplayName("should apply revoked status to status list index 0")
     void itSetsCredentialStatusToRevoked() throws Exception {
         HfsVcSl hfsVcSl = new HfsVcSl(HfsVcSlIntegrationTest.client, HfsVcSlIntegrationTest.fileKey);
         hfsVcSl.revokeByIndex(HfsVcSlIntegrationTest.fileId, 0);
@@ -94,7 +94,7 @@ class HfsVcSlIntegrationTest {
 
     @Test
     @Order(312)
-    @DisplayName("should apply suspended status to revocation list index 0")
+    @DisplayName("should apply suspended status to status list index 0")
     void itSetsCredentialStatusToSuspended() throws Exception {
         HfsVcSl hfsVcSl = new HfsVcSl(HfsVcSlIntegrationTest.client, HfsVcSlIntegrationTest.fileKey);
         hfsVcSl.suspendByIndex(HfsVcSlIntegrationTest.fileId, 0);
@@ -104,7 +104,7 @@ class HfsVcSlIntegrationTest {
 
     @Test
     @Order(313)
-    @DisplayName("should apply resumed status to revocation list index 0")
+    @DisplayName("should apply resumed status to status list index 0")
     void itSetsCredentialStatusToResumed() throws Exception {
         HfsVcSl hfsVcSl = new HfsVcSl(HfsVcSlIntegrationTest.client, HfsVcSlIntegrationTest.fileKey);
         hfsVcSl.resumeByIndex(HfsVcSlIntegrationTest.fileId, 0);
@@ -114,7 +114,7 @@ class HfsVcSlIntegrationTest {
 
     @Test
     @Order(314)
-    @DisplayName("should apply active status to revocation list index 0")
+    @DisplayName("should apply active status to status list index 0")
     void itSetsCredentialStatusToActive() throws Exception {
         HfsVcSl hfsVcSl = new HfsVcSl(HfsVcSlIntegrationTest.client, HfsVcSlIntegrationTest.fileKey);
         hfsVcSl.issueByIndex(HfsVcSlIntegrationTest.fileId, 0);
