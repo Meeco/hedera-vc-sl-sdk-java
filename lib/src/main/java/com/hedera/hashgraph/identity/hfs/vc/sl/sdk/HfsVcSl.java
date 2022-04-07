@@ -79,6 +79,10 @@ public class HfsVcSl {
      */
 
     private RevocationList updateStatus(FileId vcStatusListFileId, int vcStatusListIndex, VcSlStatus status) throws Exception {
+        if (vcStatusListIndex % 2 != 0) {
+            throw new Error("vcStatusListIndex must be Multiples of 2 OR 0. e.g. 0, 2, 4, 6, 8, 10, 12, 14");
+        }
+
         RevocationList list = this.loadRevocationList(vcStatusListFileId);
 
         switch (status) {

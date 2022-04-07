@@ -121,4 +121,17 @@ class HfsVcSlIntegrationTest {
         VcSlStatus status = hfsVcSl.resolveStatusByIndex(HfsVcSlIntegrationTest.fileId, 0);
         assertEquals(VcSlStatus.ACTIVE, status);
     }
+
+    @Test
+    @Order(315)
+    @DisplayName("should throw an error when index is not multiple of 2 or 0")
+    void invalidIndex() {
+        var errorMsg = "vcStatusListIndex must be Multiples of 2 OR 0. e.g. 0, 2, 4, 6, 8, 10, 12, 14";
+        HfsVcSl hfsVcSl = new HfsVcSl(HfsVcSlIntegrationTest.client, HfsVcSlIntegrationTest.fileKey);
+        Assertions.assertThrowsExactly(Error.class, () -> hfsVcSl.resumeByIndex(HfsVcSlIntegrationTest.fileId, 5), errorMsg);
+        Assertions.assertThrowsExactly(Error.class, () -> hfsVcSl.revokeByIndex(HfsVcSlIntegrationTest.fileId, 5), errorMsg);
+        Assertions.assertThrowsExactly(Error.class, () -> hfsVcSl.suspendByIndex(HfsVcSlIntegrationTest.fileId, 5), errorMsg);
+        Assertions.assertThrowsExactly(Error.class, () -> hfsVcSl.issueByIndex(HfsVcSlIntegrationTest.fileId, 5), errorMsg);
+
+    }
 }
