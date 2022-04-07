@@ -20,7 +20,6 @@ public class DemoTest {
 
 
     public DemoTest() {
-
         String CONFIG_FILE = "demo.config.properties";
         try (InputStream input = DemoTest.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
 
@@ -38,13 +37,12 @@ public class DemoTest {
             PrivateKey operatorKey = PrivateKey.fromString(prop.getProperty("OPERATOR_KEY"));
             client.setOperator(operatorId, operatorKey);
 
-            if (!Strings.isNullOrEmpty(prop.getProperty("VC_STATUS_LIST_OWNER_PRIVATE_KEY")))
+            this.VC_STATUS_LIST_OWNER_PRIVATE_KEY = Strings.isNullOrEmpty(prop.getProperty("VC_STATUS_LIST_OWNER_PRIVATE_KEY"))
+                    ? PrivateKey.generateED25519()
+                    : PrivateKey.fromString(prop.getProperty("VC_STATUS_LIST_OWNER_PRIVATE_KEY"));
+
+            if (!Strings.isNullOrEmpty(prop.getProperty("VC_STATUS_LIST_FILE_ID")))
                 this.VC_STATUS_LIST_FILE_ID = FileId.fromString(prop.getProperty("VC_STATUS_LIST_FILE_ID"));
-
-            if (!Strings.isNullOrEmpty(prop.getProperty("VC_STATUS_LIST_OWNER_PRIVATE_KEY")))
-                this.VC_STATUS_LIST_OWNER_PRIVATE_KEY = PrivateKey.fromString(prop.getProperty("VC_STATUS_LIST_OWNER_PRIVATE_KEY"));
-
-
         } catch (IOException ex) {
             ex.printStackTrace();
         }
